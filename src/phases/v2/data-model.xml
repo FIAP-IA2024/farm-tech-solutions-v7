@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SQL XML created by WWW SQL Designer, https://github.com/ondras/wwwsqldesigner/ -->
+<!-- Active URL: https://sql.toad.cz/ -->
+<sql>
+  <datatypes db="mysql">
+    <group label="Numeric" color="rgb(238,238,170)">
+      <type label="Integer" length="0" sql="INTEGER" quote="" />
+      <type label="INT" length="0" sql="INT" quote="" />
+      <type label="DOUBLE" length="0" sql="DOUBLE" quote="" />
+    </group>
+
+    <group label="Character" color="rgb(255,200,200)">
+      <type label="Varchar" length="1" sql="VARCHAR" quote="'" />
+    </group>
+
+    <group label="Date &amp; Time" color="rgb(200,255,200)">
+      <type label="Datetime" length="0" sql="DATETIME" quote="'" />
+      <type label="Timestamp" length="0" sql="TIMESTAMP" quote="'" />
+    </group>
+  </datatypes>
+  <table x="126" y="205" name="Sensor">
+    <row name="sensor_id" null="0" autoincrement="1">
+      <datatype>INT</datatype>
+      <default>NULL</default>
+    </row>
+    <row name="sensor_type" null="0" autoincrement="0">
+      <datatype>VARCHAR(50)</datatype>
+      <default>'NULL'</default>
+    </row>
+    <key type="PRIMARY" name="">
+      <part>sensor_id</part>
+    </key>
+  </table>
+  <table x="300" y="200" name="Sensor_Reading">
+    <row name="reading_id" null="0" autoincrement="1">
+      <datatype>INT</datatype>
+      <default>NULL</default>
+    </row>
+    <row name="sensor_id" null="0" autoincrement="0">
+      <datatype>INT</datatype>
+      <default>NULL</default>
+      <relation table="Sensor" row="sensor_id" />
+    </row>
+    <row name="timestamp" null="0" autoincrement="0">
+      <datatype>DATETIME</datatype>
+      <default>'NULL'</default>
+    </row>
+    <row name="moisture_value" null="1" autoincrement="0">
+      <datatype>DOUBLE</datatype>
+      <default>NULL</default>
+    </row>
+    <row name="ph_value" null="1" autoincrement="0">
+      <datatype>DOUBLE</datatype>
+      <default>NULL</default>
+    </row>
+    <row name="phosphorus_value" null="1" autoincrement="0">
+      <datatype>DOUBLE</datatype>
+      <default>NULL</default>
+    </row>
+    <row name="potassium_value" null="1" autoincrement="0">
+      <datatype>DOUBLE</datatype>
+      <default>NULL</default>
+    </row>
+    <key type="PRIMARY" name="">
+      <part>reading_id</part>
+    </key>
+  </table>
+  <table x="567" y="163" name="Application">
+    <row name="application_id" null="0" autoincrement="1">
+      <datatype>INT</datatype>
+      <default>NULL</default>
+    </row>
+    <row name="timestamp" null="0" autoincrement="0">
+      <datatype>TIMESTAMP</datatype>
+      <default>'NULL'</default>
+    </row>
+    <row name="water_amount" null="1" autoincrement="0">
+      <datatype>DOUBLE</datatype>
+      <default>NULL</default>
+    </row>
+    <row name="phosphorus_amount" null="1" autoincrement="0">
+      <datatype>DOUBLE</datatype>
+      <default>NULL</default>
+    </row>
+    <row name="potassium_amount" null="1" autoincrement="0">
+      <datatype>DOUBLE</datatype>
+      <default>NULL</default>
+    </row>
+    <key type="PRIMARY" name="">
+      <part>application_id</part>
+    </key>
+  </table>
+</sql>
