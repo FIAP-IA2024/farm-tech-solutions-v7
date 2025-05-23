@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import importlib.util
 import subprocess
 import tempfile
+import math
 from pathlib import Path
 
 # Add project root to path for proper imports
@@ -71,71 +72,222 @@ with tab1:
         """
     )
     
-    col1, col2 = st.columns(2)
+    # Import modules from Phase 1
+    sys.path.append(str(PHASE1_PATH))
     
-    with col1:
-        st.subheader("Crop Management")
+    try:
+        # Import the main_streamlit module (without executing the main function)
+        phase1_module_spec = importlib.util.spec_from_file_location(
+            "main_streamlit", os.path.join(project_root, "src", "phases", "v1", "main_streamlit.py")
+        )
+        phase1_module = importlib.util.module_from_spec(phase1_module_spec)
+        phase1_module_spec.loader.exec_module(phase1_module)
         
-        if st.button("Run Crop Management Tool", key="run_phase1_main"):
-            try:
-                # We'll execute the main.py script from Phase 1
-                # Since it's a GUI application, we'll inform the user
-                st.info("The Crop Management Tool is a GUI application that will be launched in a separate window.")
-                
-                # Execute the script in a subprocess
-                process = subprocess.Popen(
-                    [sys.executable, str(PHASE1_PATH / "main.py")],
-                    cwd=str(PHASE1_PATH),
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                    text=True
-                )
-                
-                # Show a success message
-                st.success("Crop Management Tool launched! Check the separate window that opened.")
-                
-                # Display any output or errors
-                stdout, stderr = process.communicate()
-                if stdout:
-                    st.code(stdout)
-                if stderr:
-                    st.error(stderr)
-            except Exception as e:
-                st.error(f"Error running Crop Management Tool: {e}")
-    
-    with col2:
-        st.subheader("Weather Data")
-        city = st.text_input("Enter city name for weather data:", "Sao Paulo")
+        # Now we can access the functions from Phase 1
+        # Tab for Phase 1
+        phase1_tab1, phase1_tab2 = st.tabs(["Crop Management", "Weather Data"])
         
-        if st.button("Get Weather Data", key="run_phase1_weather"):
-            try:
-                # Execute the weather.r script from Phase 1
-                with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.txt') as temp_file:
-                    process = subprocess.Popen(
-                        ["Rscript", str(PHASE1_PATH / "weather.r"), city],
-                        cwd=str(PHASE1_PATH),
-                        stdout=temp_file,
-                        stderr=subprocess.PIPE,
-                        text=True
+        # Tab 1: Crop Management - using functions from Phase 1
+        with phase1_tab1:
+            st.subheader("Manage Crop Data")
+            
+            # Load existing data
+            df = phase1_module.load_from_csv()
+            
+            # Form for adding new data
+            with st.form("crop_data_form"):
+                st.write("Add New Crop Data")
+                
+                # Input fields
+                crop = st.selectbox("Select Crop:", phase1_module.VALID_CROPS)
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    if crop == "Corn":
+                        length = st.number_input("Length (m):", min_value=0.1, value=1.0, step=0.1)
+                    else:
+                        length = st.number_input("Radius (m):", min_value=0.1, value=1.0, step=0.1)
+                
+                with col2:
+                    if crop == "Corn":
+                        width = st.number_input("Width (m):", min_value=0.1, value=1.0, step=0.1)
+                    else:
+                        width = st.number_input("Width (not used for Coffee):", min_value=0.1, value=1.0, step=0.1, disabled=True)
+                
+                # Calculate button
+                submitted = st.form_submit_button("Calculate and Add")
+                
+                if submitted:
+                    # Calculate area based on crop type
+                    if crop == "Corn":
+                        area = phase1_module.calculate_rectangle_area(length, width)
+                    else:  # Coffee
+                        area = phase1_module.calculate_circle_area(length)
+                    
+                    # Calculate inputs needed
+                    input_needed = phase1_module.calculate_inputs(crop, area)
+                    
+                    # Add to dataframe
+                    new_row = pd.DataFrame({"Crop": [crop], "Area": [area], "Input Needed": [input_needed]})
+                    df = pd.concat([df, new_row], ignore_index=True)
+                    
+                    # Save to CSV
+                    phase1_module.save_to_csv(df)
+                    
+                    st.success(f"Added new {crop} data with area {area:.2f} and input needed {input_needed:.2f}")
+                    st.rerun()
+            
+            # Display existing data
+            if not df.empty:
+                st.subheader("Existing Crop Data")
+                
+                # Format the dataframe for display
+                display_df = df.copy()
+                display_df["Area"] = display_df["Area"].apply(lambda x: f"{x:.2f}")
+                display_df["Input Needed"] = display_df["Input Needed"].apply(lambda x: f"{x:.2f}")
+                
+                # Add an index column for row selection
+                display_df.insert(0, "#", range(1, len(display_df) + 1))
+                
+                st.dataframe(display_df, use_container_width=True)
+                
+                # Actions for selected rows
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    # Delete selected rows
+                    rows_to_delete = st.multiselect(
+                        "Select rows to delete:", 
+                        options=list(range(1, len(df) + 1)),
+                        format_func=lambda x: f"Row {x}"
                     )
                     
-                    stderr = process.communicate()[1]
-                    if process.returncode != 0:
-                        st.error(f"Error running weather script: {stderr}")
-                    else:
-                        # Read the results from the temp file
-                        temp_file.close()
-                        with open(temp_file.name, 'r') as f:
-                            weather_data = f.read()
+                    if st.button("Delete Selected", type="primary", use_container_width=True):
+                        if rows_to_delete:
+                            # Convert 1-based index to 0-based index
+                            indices = [i-1 for i in rows_to_delete]
+                            df = df.drop(indices).reset_index(drop=True)
+                            phase1_module.save_to_csv(df)
+                            st.success(f"Deleted {len(rows_to_delete)} row(s)")
+                            st.rerun()
+                            
+                with col2:
+                    # Update row
+                    if not df.empty:
+                        row_to_update = st.selectbox(
+                            "Select a row to update:",
+                            options=list(range(1, len(df) + 1)),
+                            format_func=lambda x: f"Row {x}: {df.iloc[x-1]['Crop']}"
+                        )
                         
-                        # Display the weather data
-                        st.success(f"Weather data for {city}:")
-                        st.write(weather_data)
+                        if st.button("Edit Selected Row", type="secondary", use_container_width=True):
+                            st.session_state.edit_row = row_to_update - 1  # Store 0-based index
+                
+                # Edit form appears when a row is selected for editing
+                if "edit_row" in st.session_state and len(df) > 0:
+                    row_idx = st.session_state.edit_row
+                    if row_idx < len(df):
+                        row_data = df.iloc[row_idx]
                         
-                        # Clean up
-                        os.unlink(temp_file.name)
-            except Exception as e:
-                st.error(f"Error getting weather data: {e}")
+                        st.subheader(f"Edit Row {row_idx + 1}")
+                        
+                        with st.form("edit_form"):
+                            edit_crop = st.selectbox(
+                                "Crop:", phase1_module.VALID_CROPS, 
+                                index=phase1_module.VALID_CROPS.index(row_data["Crop"])
+                            )
+                            
+                            col1, col2 = st.columns(2)
+                            with col1:
+                                if edit_crop == "Corn":
+                                    # For rectangle, we need to reverse-calculate length and width
+                                    # Since we only store area, we'll assume square (length = width) for simplicity
+                                    old_length = math.sqrt(row_data["Area"]) if edit_crop == "Corn" else row_data["Area"] / math.pi
+                                    edit_length = st.number_input(
+                                        "Length (m):", min_value=0.1, value=float(old_length), step=0.1
+                                    )
+                                else:
+                                    # For circle, we need to reverse-calculate radius
+                                    old_radius = math.sqrt(row_data["Area"] / math.pi)
+                                    edit_length = st.number_input(
+                                        "Radius (m):", min_value=0.1, value=float(old_radius), step=0.1
+                                    )
+                            
+                            with col2:
+                                if edit_crop == "Corn":
+                                    edit_width = st.number_input(
+                                        "Width (m):", min_value=0.1, value=float(old_length), step=0.1
+                                    )
+                                else:
+                                    edit_width = st.number_input(
+                                        "Width (not used for Coffee):", min_value=0.1, value=1.0, step=0.1, disabled=True
+                                    )
+                            
+                            # Use colunas para os botões ficarem lado a lado
+                            btn_col1, btn_col2 = st.columns(2)
+                            with btn_col1:
+                                update_submitted = st.form_submit_button("Update", use_container_width=True)
+                            with btn_col2:
+                                cancel = st.form_submit_button("Cancel", use_container_width=True)
+                            
+                            if update_submitted:
+                                # Calculate new area and input needed
+                                if edit_crop == "Corn":
+                                    new_area = phase1_module.calculate_rectangle_area(edit_length, edit_width)
+                                else:
+                                    new_area = phase1_module.calculate_circle_area(edit_length)
+                                
+                                new_input = phase1_module.calculate_inputs(edit_crop, new_area)
+                                
+                                # Update the dataframe
+                                df.at[row_idx, "Crop"] = edit_crop
+                                df.at[row_idx, "Area"] = new_area
+                                df.at[row_idx, "Input Needed"] = new_input
+                                
+                                # Save changes
+                                phase1_module.save_to_csv(df)
+                                
+                                # Clear edit state and refresh
+                                del st.session_state.edit_row
+                                st.success("Row updated successfully!")
+                                st.rerun()
+                            
+                            if cancel:
+                                del st.session_state.edit_row
+                                st.rerun()
+            else:
+                st.info("No crop data available. Add some data using the form above.")
+        
+        # Tab 2: Weather Data
+        with phase1_tab2:
+            st.subheader("Weather Data")
+            st.write("Get current weather information for any city.")
+            
+            city = st.text_input("Enter city name:", "Sao Paulo")
+            
+            if st.button("Get Weather Data"):
+                weather_data = phase1_module.get_weather_data(city)
+                
+                if weather_data:
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.metric("Temperature", f"{weather_data['temperature']}°C")
+                        st.metric("Humidity", f"{weather_data['humidity']}%")
+                    
+                    with col2:
+                        st.metric("Wind Speed", f"{weather_data['wind_speed']} m/s")
+                        st.metric("Conditions", weather_data['description'].capitalize())
+                    
+                    st.success(f"Current weather data for {city} retrieved successfully!")
+                else:
+                    st.error(f"Failed to retrieve weather data for {city}. Please check the city name and your API key.")
+    except Exception as e:
+        st.error(f"Error integrating Phase 1: {e}")
+        st.info("Alternatively, you can run Phase 1 directly with the following command:")
+        main_script = os.path.join(project_root, "src", "phases", "v1", "main_streamlit.py")
+        st.code(f"{sys.executable} -m streamlit run {main_script}", language="bash")
+
 
 # Phase 2: Database Structure
 with tab2:
@@ -254,14 +406,16 @@ with tab6:
                 
                 # Execute the Python script from Phase 6
                 with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.txt') as temp_file:
+                    # Use absolute path for the Phase 6 script
+                    cv_script = os.path.join(project_root, "src", "phases", "v6", "notebooks", "GabrielRibeiro_rm560173_pbl_fase6.py")
                     process = subprocess.Popen(
                         [
                             sys.executable, 
-                            str(PHASE6_PATH / "notebooks" / "GabrielRibeiro_rm560173_pbl_fase6.py"),
+                            cv_script,
                             "--epochs", str(epochs),
                             "--batch-size", str(batch_size)
                         ],
-                        cwd=str(PHASE6_PATH),
+                        cwd=str(project_root),
                         stdout=temp_file,
                         stderr=subprocess.PIPE,
                         text=True
@@ -301,9 +455,11 @@ with tab6:
         )
         
         # Check if results directory exists and list available result folders
-        results_dir = PHASE6_PATH / "results"
-        if results_dir.exists() and results_dir.is_dir():
-            result_folders = [f for f in results_dir.iterdir() if f.is_dir()]
+        results_dir = os.path.join(project_root, "src", "phases", "v6", "results")
+        if os.path.exists(results_dir) and os.path.isdir(results_dir):
+            # Convert string path to Path object for directory operations
+            results_path = Path(results_dir)
+            result_folders = [f for f in results_path.iterdir() if f.is_dir()]
             if result_folders:
                 selected_result = st.selectbox(
                     "Select a result to view:",
@@ -312,7 +468,7 @@ with tab6:
                 )
                 
                 # Display some images from the selected result folder
-                selected_path = results_dir / selected_result
+                selected_path = results_path / selected_result
                 image_files = list(selected_path.glob("*.png")) + list(selected_path.glob("*.jpg"))
                 
                 if image_files:
