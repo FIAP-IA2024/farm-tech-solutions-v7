@@ -1,0 +1,28 @@
+# FarmTech System - Integrated Dashboard Requirements
+
+# Core dependencies
+streamlit>=1.22.0
+pandas>=1.5.3
+numpy>=1.24.3
+matplotlib>=3.7.1
+seaborn>=0.12.2
+
+# For Phase 1 (Planting area and weather)
+# Note: tkinter is built-in with Python, no need to install separately
+python-dotenv>=1.0.0
+requests>=2.31.0
+
+# For Phase 3 (IoT simulation)
+# SQLite is built into Python, no need for external package
+
+# For Phase 6 (Computer Vision)
+torch>=2.0.0
+torchvision>=0.15.0
+ultralytics>=8.0.0
+pillow>=9.5.0
+opencv-python>=4.7.0
+
+# Other utilities
+importlib-metadata>=6.6.0
+python-dateutil>=2.8.2
+pytz>=2023.3
