@@ -203,35 +203,12 @@ root = tk.Tk()
 root.title("FIAP - Farm Tech Solutions")
 root.geometry("1300x790")
 
-# Set theme and colors for better visibility
-root.configure(bg="#f0f0f0")  # Light gray background
-
-# Make sure the window is raised and focused
-root.attributes('-topmost', True)
-root.update()
-root.attributes('-topmost', False)
-
 # Centralize the window on screen
-try:
-    root.eval("tk::PlaceWindow %s center" % root.winfo_pathname(root.winfo_id()))
-except Exception as e:
-    print(f"Could not center window: {e}")
-    # Alternative method to center the window
-    window_width = root.winfo_width()
-    window_height = root.winfo_height()
-    screen_width = root.winfo_screenwidth()
-    screen_height = root.winfo_screenheight()
-    x = int((screen_width - window_width) / 2)
-    y = int((screen_height - window_height) / 2)
-    root.geometry(f"+{x}+{y}")
+root.eval("tk::PlaceWindow %s center" % root.winfo_pathname(root.winfo_id()))
 
-# Ensure Tkinter theme is properly set
-style = ttk.Style()
-style.theme_use('clam')  # Use a more modern theme
-
-# Frame for inputs with explicit styling
-input_frame = tk.Frame(root, padx=20, pady=20, bg='#f0f0f0')
-input_frame.pack(pady=10, fill='both', expand=True)
+# Frame for inputs
+input_frame = tk.Frame(root, padx=20, pady=20)
+input_frame.pack(pady=10)
 
 tk.Label(input_frame, text="Crop:", font=("Arial", 14)).grid(
     row=0, column=0, padx=5, pady=5
@@ -262,9 +239,9 @@ tk.Button(
     input_frame, text="Add Data", command=enter_data, font=("Arial", 14), width=20
 ).grid(row=3, column=0, columnspan=2, pady=10)
 
-# Frame for the table and scrollbar - improve visibility
-table_frame = tk.Frame(root, bg='#f0f0f0', padx=10, pady=10)
-table_frame.pack(pady=20, fill='both', expand=True)
+# Frame for the table and scrollbar
+table_frame = tk.Frame(root)
+table_frame.pack(pady=20)
 
 # Add scrollbar for the table
 scrollbar = ttk.Scrollbar(table_frame)
@@ -278,12 +255,7 @@ tree = ttk.Treeview(
     height=10,
     yscrollcommand=scrollbar.set,
     selectmode="extended",
-    style="Custom.Treeview"
 )
-
-# Configure the Treeview style for better visibility
-style.configure("Custom.Treeview", background="white", foreground="black", rowheight=25, fieldbackground="white")
-style.configure("Custom.Treeview.Heading", font=("Arial", 12, "bold"), background="#e0e0e0", foreground="black")
 scrollbar.config(command=tree.yview)
 
 tree.column("Row", anchor=tk.CENTER, width=50)
@@ -298,8 +270,8 @@ tree.heading("Input", text="Input Needed")
 tree.pack()
 
 # Buttons for deleting data and selecting all
-button_frame = tk.Frame(root, bg='#f0f0f0', padx=20, pady=10)
-button_frame.pack(pady=10, fill='x')
+button_frame = tk.Frame(root)
+button_frame.pack(pady=10)
 
 delete_button = tk.Button(
     button_frame,
@@ -307,10 +279,6 @@ delete_button = tk.Button(
     font=("Arial", 14),
     width=20,
     command=delete_data,
-    bg="#e74c3c",  # Red color for delete
-    fg="white",
-    relief=tk.RAISED,
-    bd=2
 )
 delete_button.grid(row=0, column=0, padx=10)
 
@@ -320,10 +288,6 @@ select_all_button = tk.Button(
     font=("Arial", 14),
     width=20,
     command=select_all_data,
-    bg="#3498db",  # Blue color for select all
-    fg="white",
-    relief=tk.RAISED,
-    bd=2
 )
 select_all_button.grid(row=0, column=1, padx=10)
 
@@ -333,10 +297,6 @@ update_button = tk.Button(
     font=("Arial", 14),
     width=20,
     command=open_update_modal,
-    bg="#2ecc71",  # Green color for update
-    fg="white",
-    relief=tk.RAISED,
-    bd=2
 )
 update_button.grid(row=0, column=2, padx=10)
 
