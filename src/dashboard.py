@@ -263,9 +263,9 @@ with tab1:
             st.subheader("Weather Data")
             st.write("Get current weather information for any city.")
             
-            city = st.text_input("Enter city name:", "Sao Paulo")
+            city = st.text_input("Enter city name:", "Sao Paulo", key="phase1_weather_input")
             
-            if st.button("Get Weather Data"):
+            if st.button("Get Weather Data", key="phase1_weather_button"):
                 weather_data = phase1_module.get_weather_data(city)
                 
                 if weather_data:
@@ -337,7 +337,7 @@ with tab3:
         if weather_module and database_module:
             # Weather data
             st.subheader("Weather Data")
-            city = st.text_input("Enter city name:", "Sao Paulo")
+            city = st.text_input("Enter city name:", "Sao Paulo", key="phase3_city_input")
             
             if st.button("Get Weather Data", key="run_phase3_weather"):
                 try:
