@@ -58,6 +58,7 @@ Este projeto representa a Fase 7 - A Consolidação de um Sistema, onde integram
 │       ├── v4/                 # Fase 4: Dashboard com Data Science
 │       ├── v5/                 # Fase 5: Cloud Computing & Segurança
 │       └── v6/                 # Fase 6: Visão Computacional
+├── results/                # Resultados da visão computacional (Fase 6)
 ```
 
 ---
@@ -112,17 +113,15 @@ Este projeto representa a Fase 7 - A Consolidação de um Sistema, onde integram
   - R (para análise estatística e visualizações na Fase 1)
   - C/C++ (para programação do ESP32 na Fase 3)
   - SQL (para gerenciamento de banco de dados na Fase 2)
-  - HCL (HashiCorp Configuration Language para Terraform na Fase 5)
 
 - **Bibliotecas e Frameworks:**
   - **Python**:
     - Streamlit (para dashboard interativo)
     - Pandas, NumPy (para manipulação de dados)
-    - Matplotlib, Plotly (para visualizações)
+    - Matplotlib (para visualizações)
     - Scikit-learn (para Machine Learning na Fase 4)
     - Ultralytics/YOLO (para visão computacional na Fase 6)
     - Flask (para APIs web na Fase 3)
-    - Boto3 (para integração com serviços AWS na Fase 5)
   - **R**:
     - dplyr (para manipulação de dados)
     - ggplot2 (para visualizações gráficas)
@@ -131,16 +130,14 @@ Este projeto representa a Fase 7 - A Consolidação de um Sistema, onde integram
 - **Ferramentas e Serviços:**
   - **AWS**:
     - EC2 (para hospedagem do dashboard)
-    - RDS (para banco de dados)
     - S3 (para armazenamento de dados)
-    - Lambda (para processamento sem servidor)
-    - SNS (para sistema de alertas)
     - CloudWatch (para monitoramento)
   - **Hardware**:
     - ESP32 (microcontrolador para IoT)
     - Sensores (umidade, pH, temperatura, etc.)
   - **Outros**:
     - Git (controle de versão)
+    - Jupyter Notebooks (análise de dados)
 
 ---
 
