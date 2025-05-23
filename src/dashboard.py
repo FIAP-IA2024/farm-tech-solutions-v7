@@ -395,9 +395,10 @@ with tab6:
         """
     )
     
-    col1, col2 = st.columns(2)
+    # Usar tabs em vez de colunas para organizar melhor o conteúdo
+    train_tab, results_tab = st.tabs(["Run Object Detection", "Visualizar Resultados"])
     
-    with col1:
+    with train_tab:
         st.subheader("Run Object Detection")
         epochs = st.slider("Number of epochs", min_value=10, max_value=100, value=30, step=10)
         batch_size = st.slider("Batch size", min_value=4, max_value=32, value=16, step=4)
@@ -508,7 +509,7 @@ with tab6:
                     except Exception as e:
                         st.error(f"Erro ao cancelar o treinamento: {e}")
     
-    with col2:
+    with results_tab:
         st.subheader("Visualizar Resultados")
         st.markdown(
             """
