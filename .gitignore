@@ -3,3 +3,10 @@
 __pycache__
 venv
 data.csv
+
+# YOLO
+results/*
+!results/.gitkeep
+yolo_training.log
+yolov5s.pt
+labels.cache
