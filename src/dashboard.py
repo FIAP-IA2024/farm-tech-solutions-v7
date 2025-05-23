@@ -603,7 +603,7 @@ with tab6:
                             st.image(
                                 str(selected_img_path),
                                 caption=selected_image,
-                                use_column_width=True
+                                use_container_width=True
                             )
                             
                             # Opção para baixar a imagem
