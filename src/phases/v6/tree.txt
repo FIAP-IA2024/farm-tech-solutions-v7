@@ -1,0 +1,266 @@
+.
+├── README.md
+├── data
+│   ├── dataset.yaml
+│   ├── test
+│   │   ├── images
+│   │   │   ├── A_037.jpg
+│   │   │   ├── A_038.jpg
+│   │   │   ├── A_039.jpg
+│   │   │   ├── A_040.jpg
+│   │   │   ├── B_037.jpg
+│   │   │   ├── B_038.jpg
+│   │   │   ├── B_039.jpg
+│   │   │   └── B_040.jpg
+│   │   └── labels
+│   │       ├── A_037.txt
+│   │       ├── A_038.txt
+│   │       ├── A_039.txt
+│   │       ├── A_040.txt
+│   │       ├── B_037.txt
+│   │       ├── B_038.txt
+│   │       ├── B_039.txt
+│   │       └── B_040.txt
+│   ├── train
+│   │   ├── images
+│   │   │   ├── A_001.jpg
+│   │   │   ├── A_002.jpg
+│   │   │   ├── A_003.jpg
+│   │   │   ├── A_004.jpg
+│   │   │   ├── A_005.jpg
+│   │   │   ├── A_006.jpg
+│   │   │   ├── A_007.jpg
+│   │   │   ├── A_008.jpg
+│   │   │   ├── A_009.jpg
+│   │   │   ├── A_010.jpg
+│   │   │   ├── A_011.jpg
+│   │   │   ├── A_012.jpg
+│   │   │   ├── A_013.jpg
+│   │   │   ├── A_014.jpg
+│   │   │   ├── A_015.jpg
+│   │   │   ├── A_016.jpg
+│   │   │   ├── A_017.jpg
+│   │   │   ├── A_018.jpg
+│   │   │   ├── A_019.jpg
+│   │   │   ├── A_020.jpg
+│   │   │   ├── A_021.jpg
+│   │   │   ├── A_022.jpg
+│   │   │   ├── A_023.jpg
+│   │   │   ├── A_024.jpg
+│   │   │   ├── A_025.jpg
+│   │   │   ├── A_026.jpg
+│   │   │   ├── A_027.jpg
+│   │   │   ├── A_028.jpg
+│   │   │   ├── A_029.jpg
+│   │   │   ├── A_030.jpg
+│   │   │   ├── A_031.jpg
+│   │   │   ├── A_032.jpg
+│   │   │   ├── B_001.jpg
+│   │   │   ├── B_002.jpg
+│   │   │   ├── B_003.jpg
+│   │   │   ├── B_004.jpg
+│   │   │   ├── B_005.jpg
+│   │   │   ├── B_006.jpg
+│   │   │   ├── B_007.jpg
+│   │   │   ├── B_008.jpg
+│   │   │   ├── B_009.jpg
+│   │   │   ├── B_010.jpg
+│   │   │   ├── B_011.jpg
+│   │   │   ├── B_012.jpg
+│   │   │   ├── B_013.jpg
+│   │   │   ├── B_014.jpg
+│   │   │   ├── B_015.jpg
+│   │   │   ├── B_016.jpg
+│   │   │   ├── B_017.jpg
+│   │   │   ├── B_018.jpg
+│   │   │   ├── B_019.jpg
+│   │   │   ├── B_020.jpg
+│   │   │   ├── B_021.jpg
+│   │   │   ├── B_022.jpg
+│   │   │   ├── B_023.jpg
+│   │   │   ├── B_024.jpg
+│   │   │   ├── B_025.jpg
+│   │   │   ├── B_026.jpg
+│   │   │   ├── B_027.jpg
+│   │   │   ├── B_028.jpg
+│   │   │   ├── B_029.jpg
+│   │   │   ├── B_030.jpg
+│   │   │   ├── B_031.jpg
+│   │   │   └── B_032.jpg
+│   │   ├── labels
+│   │   │   ├── A_001.txt
+│   │   │   ├── A_002.txt
+│   │   │   ├── A_003.txt
+│   │   │   ├── A_004.txt
+│   │   │   ├── A_005.txt
+│   │   │   ├── A_006.txt
+│   │   │   ├── A_007.txt
+│   │   │   ├── A_008.txt
+│   │   │   ├── A_009.txt
+│   │   │   ├── A_010.txt
+│   │   │   ├── A_011.txt
+│   │   │   ├── A_012.txt
+│   │   │   ├── A_013.txt
+│   │   │   ├── A_014.txt
+│   │   │   ├── A_015.txt
+│   │   │   ├── A_016.txt
+│   │   │   ├── A_017.txt
+│   │   │   ├── A_018.txt
+│   │   │   ├── A_019.txt
+│   │   │   ├── A_020.txt
+│   │   │   ├── A_021.txt
+│   │   │   ├── A_022.txt
+│   │   │   ├── A_023.txt
+│   │   │   ├── A_024.txt
+│   │   │   ├── A_025.txt
+│   │   │   ├── A_026.txt
+│   │   │   ├── A_027.txt
+│   │   │   ├── A_028.txt
+│   │   │   ├── A_029.txt
+│   │   │   ├── A_030.txt
+│   │   │   ├── A_031.txt
+│   │   │   ├── A_032.txt
+│   │   │   ├── B_001.txt
+│   │   │   ├── B_002.txt
+│   │   │   ├── B_003.txt
+│   │   │   ├── B_004.txt
+│   │   │   ├── B_005.txt
+│   │   │   ├── B_006.txt
+│   │   │   ├── B_007.txt
+│   │   │   ├── B_008.txt
+│   │   │   ├── B_009.txt
+│   │   │   ├── B_010.txt
+│   │   │   ├── B_011.txt
+│   │   │   ├── B_012.txt
+│   │   │   ├── B_013.txt
+│   │   │   ├── B_014.txt
+│   │   │   ├── B_015.txt
+│   │   │   ├── B_016.txt
+│   │   │   ├── B_017.txt
+│   │   │   ├── B_018.txt
+│   │   │   ├── B_019.txt
+│   │   │   ├── B_020.txt
+│   │   │   ├── B_021.txt
+│   │   │   ├── B_022.txt
+│   │   │   ├── B_023.txt
+│   │   │   ├── B_024.txt
+│   │   │   ├── B_025.txt
+│   │   │   ├── B_026.txt
+│   │   │   ├── B_027.txt
+│   │   │   ├── B_028.txt
+│   │   │   ├── B_029.txt
+│   │   │   ├── B_030.txt
+│   │   │   ├── B_031.txt
+│   │   │   └── B_032.txt
+│   │   └── labels.cache
+│   └── val
+│       ├── images
+│       │   ├── A_033.jpg
+│       │   ├── A_034.jpg
+│       │   ├── A_035.jpg
+│       │   ├── A_036.jpg
+│       │   ├── B_033.jpg
+│       │   ├── B_034.jpg
+│       │   ├── B_035.jpg
+│       │   └── B_036.jpg
+│       ├── labels
+│       │   ├── A_033.txt
+│       │   ├── A_034.txt
+│       │   ├── A_035.txt
+│       │   ├── A_036.txt
+│       │   ├── B_033.txt
+│       │   ├── B_034.txt
+│       │   ├── B_035.txt
+│       │   └── B_036.txt
+│       └── labels.cache
+├── notebooks
+│   ├── GabrielRibeiro_rm560173_pbl_fase6.ipynb
+│   ├── GabrielRibeiro_rm560173_pbl_fase6.py
+│   ├── yolo_training.log
+│   └── yolov5s.pt
+├── requirements.txt
+├── results
+│   ├── analysis
+│   │   └── analysis_output
+│   └── comparison
+│       ├── analysis_output
+│       │   ├── comparison_summary.md
+│       │   ├── matriz_confusao_30_Épocas.png
+│       │   ├── matriz_confusao_60_Épocas.png
+│       │   ├── metrics_mAP_0.5:0.95_comparison.png
+│       │   ├── metrics_mAP_0.5_comparison.png
+│       │   ├── metrics_precision_comparison.png
+│       │   ├── metrics_recall_comparison.png
+│       │   ├── train_box_loss_comparison.png
+│       │   ├── train_cls_loss_comparison.png
+│       │   ├── train_obj_loss_comparison.png
+│       │   ├── val_box_loss_comparison.png
+│       │   └── val_obj_loss_comparison.png
+│       ├── analysis_results
+│       │   └── analysis_summary.md
+│       ├── analysis_summary.md
+│       ├── comparison_report.md
+│       ├── train_e30_bs16_20250429_103607
+│       │   ├── F1_curve.png
+│       │   ├── PR_curve.png
+│       │   ├── P_curve.png
+│       │   ├── R_curve.png
+│       │   ├── confusion_matrix.png
+│       │   ├── hyp.yaml
+│       │   ├── labels.jpg
+│       │   ├── labels_correlogram.jpg
+│       │   ├── opt.yaml
+│       │   ├── results.csv
+│       │   ├── results.png
+│       │   ├── train_batch0.jpg
+│       │   ├── train_batch1.jpg
+│       │   ├── train_batch2.jpg
+│       │   ├── val_batch0_labels.jpg
+│       │   ├── val_batch0_pred.jpg
+│       │   └── weights
+│       │       ├── best.pt
+│       │       └── last.pt
+│       ├── train_e60_bs16_20250429_105247
+│       │   ├── F1_curve.png
+│       │   ├── PR_curve.png
+│       │   ├── P_curve.png
+│       │   ├── R_curve.png
+│       │   ├── confusion_matrix.png
+│       │   ├── hyp.yaml
+│       │   ├── labels.jpg
+│       │   ├── labels_correlogram.jpg
+│       │   ├── opt.yaml
+│       │   ├── results.csv
+│       │   ├── results.png
+│       │   ├── train_batch0.jpg
+│       │   ├── train_batch1.jpg
+│       │   ├── train_batch2.jpg
+│       │   ├── val_batch0_labels.jpg
+│       │   ├── val_batch0_pred.jpg
+│       │   └── weights
+│       │       ├── best.pt
+│       │       └── last.pt
+│       ├── val_best_20250429_112355
+│       │   ├── F1_curve.png
+│       │   ├── PR_curve.png
+│       │   ├── P_curve.png
+│       │   ├── R_curve.png
+│       │   ├── confusion_matrix.png
+│       │   ├── val_batch0_labels.jpg
+│       │   └── val_batch0_pred.jpg
+│       └── val_best_20250429_112434
+│           ├── F1_curve.png
+│           ├── PR_curve.png
+│           ├── P_curve.png
+│           ├── R_curve.png
+│           ├── confusion_matrix.png
+│           ├── val_batch0_labels.jpg
+│           └── val_batch0_pred.jpg
+├── scripts
+│   ├── results_analysis.py
+│   └── run_analysis.sh
+├── tree.txt
+├── yolo_training.log
+└── yolov5s.pt
+
+25 directories, 239 files
