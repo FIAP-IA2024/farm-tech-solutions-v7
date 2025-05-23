@@ -489,7 +489,18 @@ with tab6:
                     
                 if log_content:
                     st.subheader("Log do Treinamento (Tempo Real)")
-                    st.text_area("\n", log_content, height=300)
+                    
+                    # Usar st.code em vez de st.text_area para mostrar logs de forma não editável
+                    st.code(log_content, language="bash")
+                    
+                    # Adicionar indicação animada de processo em execução
+                    if process.poll() is None:  # Se o processo ainda estiver rodando
+                        # Criar um efeito de loading com pontos
+                        import time
+                        animation_chars = [".  ", ".. ", "...", "   "]
+                        idx = int(time.time() * 2) % len(animation_chars)  # Atualiza a cada 0.5 segundos
+                        loading_msg = f"Processo em execução {animation_chars[idx]}"
+                        st.caption(loading_msg)
                     
             # Botão para cancelar o treinamento
             if st.button("Cancelar Treinamento", key="cancel_phase6"):
