@@ -1,0 +1,10 @@
+data.csv
+.DS_Store
+tmp
+.env
+*.Rproj.user
+.Rhistory
+.RData
+Rplots.pdf
+histogram_area.png
+boxplot_inputs_needed.png
