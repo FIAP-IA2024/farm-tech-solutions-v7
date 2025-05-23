@@ -43,34 +43,151 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Add sidebar
+# Add sidebar for navigation
 st.sidebar.title("FarmTech System")
 st.sidebar.subheader("Dashboard Integrado")
 st.sidebar.markdown("---")
 
-# Main content
-st.title("🌱 FarmTech System - Dashboard Integrado")
+# Inicializar a sessão state para a página selecionada se não existir
+if 'selected_page' not in st.session_state:
+    st.session_state.selected_page = 'Home'
+
+# Função para mudar a página quando um botão é clicado
+def change_page(page):
+    st.session_state.selected_page = page
+    
+# Adicionar CSS personalizado para melhorar aparência dos botões
 st.markdown(
     """
-    Este dashboard integra múltiplas fases do projeto FarmTech:
-    - **Fase 1**: Cálculo de área de plantio e dados meteorológicos
-    - **Fase 2**: Estrutura e modelos de banco de dados relacional
-    - **Fase 3**: Lógica de irrigação IoT simulada
-    - **Fase 6**: Análise de imagens com visão computacional
-    
-    Selecione uma fase abaixo para interagir com suas funcionalidades.
-    """
+    <style>
+    div.stButton > button {
+        width: 100%;
+        border: 2px solid #e0e0e0;
+        padding: 12px 20px;
+        text-align: left;
+        background-color: transparent;
+        color: #FAFAFA;
+        border-radius: 5px;
+        margin-bottom: 12px;
+        font-weight: normal;
+        transition: all 0.3s;
+    }
+    div.stButton > button:hover {
+        border-color: #ff4b4b;
+        color: #ff4b4b;
+    }
+    div.stButton > button:focus:not(:active) {
+        border-color: #ff4b4b;
+        box-shadow: none;
+    }
+    /* Estilo para o botão ativo */
+    .stButton > [data-testid*="primary"] {
+        border: 2px solid #ff4b4b !important;
+        background-color: rgba(255, 75, 75, 0.1) !important;
+        color: #ff4b4b !important;
+        font-weight: bold !important;
+    }
+    </style>
+    """, unsafe_allow_html=True
 )
 
-# Create tabs for each phase
-tab1, tab2, tab3, tab6 = st.tabs(["Fase 1: Plantio & Clima", "Fase 2: Banco de Dados", "Fase 3: Irrigação IoT", "Fase 6: Visão Computacional"])
+# Definir os ícones e páginas no menu de navegação
+st.sidebar.markdown("### Navegação")
 
-# Phase 1: Planting area calculation and weather data
-with tab1:
-    st.header("Fase 1: Área de Plantio & Dados Climáticos")
+# Botão Home
+if st.sidebar.button("🏛 Home", key="home_btn", use_container_width=True, type="primary" if st.session_state.selected_page == "Home" else "secondary"):
+    change_page("Home")
+    st.rerun()
+
+# Botão Fase 1
+if st.sidebar.button("🌱 Fase 1: Plantio & Clima", key="fase1_btn", use_container_width=True, type="primary" if st.session_state.selected_page == "Fase 1: Plantio & Clima" else "secondary"):
+    change_page("Fase 1: Plantio & Clima")
+    st.rerun()
+    
+# Botão Fase 2
+if st.sidebar.button("📊 Fase 2: Banco de Dados", key="fase2_btn", use_container_width=True, type="primary" if st.session_state.selected_page == "Fase 2: Banco de Dados" else "secondary"):
+    change_page("Fase 2: Banco de Dados")
+    st.rerun()
+    
+# Botão Fase 3
+if st.sidebar.button("💧 Fase 3: Irrigação IoT", key="fase3_btn", use_container_width=True, type="primary" if st.session_state.selected_page == "Fase 3: Irrigação IoT" else "secondary"):
+    change_page("Fase 3: Irrigação IoT")
+    st.rerun()
+    
+# Botão Fase 6
+if st.sidebar.button("📸 Fase 6: Visão Computacional", key="fase6_btn", use_container_width=True, type="primary" if st.session_state.selected_page == "Fase 6: Visão Computacional" else "secondary"):
+    change_page("Fase 6: Visão Computacional")
+    st.rerun()
+
+# Adicionar separação após os botões
+st.sidebar.markdown("---")
+
+# Usar a página selecionada da session_state
+selected_page = st.session_state.selected_page
+
+# Conteúdo principal baseado na página selecionada
+
+# Página inicial
+if selected_page == "Home":
+    st.title("🌱 FarmTech System - Dashboard Integrado")
+    
+    # Exibir introdução do projeto
     st.markdown(
         """
-        Esta fase calcula áreas de plantio e gerencia dados de culturas. Também fornece dados meteorológicos através da API OpenWeather.
+        ## Bem-vindo ao Dashboard Integrado FarmTech System!
+        
+        Este dashboard integra as principais fases do projeto FarmTech Solutions, consolidando ferramentas e funcionalidades
+        desenvolvidas ao longo do curso em uma única interface intuitiva.
+        
+        ### Sobre o Projeto
+        
+        O FarmTech Solutions é um sistema de gestão agrícola que utiliza tecnologias modernas para otimizar o manejo de culturas
+        e recursos, melhorando a produtividade e sustentabilidade na agricultura.
+        
+        ### Funcionalidades Integradas
+        
+        Este dashboard reúne as seguintes fases do projeto:
+        
+        - **Fase 1: Plantio & Clima**
+          Cálculo de áreas de plantio, gerenciamento de culturas e consulta de dados meteorológicos.
+        
+        - **Fase 2: Banco de Dados**
+          Estrutura relacional para armazenamento e gestão de informações agrícolas.
+        
+        - **Fase 3: Irrigação IoT**
+          Simulação de dispositivos IoT para monitoramento e controle de sistemas de irrigação.
+        
+        - **Fase 6: Visão Computacional**
+          Implementação de técnicas de detecção de objetos usando o framework YOLO.
+        
+        ### Como Usar
+        
+        Utilize o menu de navegação na barra lateral para acessar as diferentes fases do projeto.
+        Cada fase possui suas próprias funcionalidades e interfaces específicas.
+        
+        ### Desenvolvido por:
+        Alunos da FIAP - Curso de Pós-Graduação em Inteligência Artificial e Machine Learning
+        """
+    )
+    
+    # Adicionar imagem ou card para cada fase na página inicial
+    st.subheader("Acesso Rápido")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.info("**Fase 1: Plantio & Clima**\n\nCálculo de áreas de plantio e dados meteorológicos.")
+        st.info("**Fase 2: Banco de Dados**\n\nModelos relacionais e estrutura de dados.")
+    
+    with col2:
+        st.info("**Fase 3: Irrigação IoT**\n\nMonitoramento e controle de sistemas de irrigação.")
+        st.info("**Fase 6: Visão Computacional**\n\nDetecção de objetos usando YOLO.")
+
+# Fase 1: Planting area calculation and weather data
+elif selected_page == "Fase 1: Plantio & Clima":
+    st.header("Fase 1: Cálculo de Área de Plantio e Dados Meteorológicos")
+    st.markdown(
+        """
+        Esta fase permite calcular áreas de plantio, gerenciar culturas e obter dados meteorológicos atuais.
         """
     )
     
@@ -87,7 +204,7 @@ with tab1:
         
         # Now we can access the functions from Phase 1
         # Tab for Phase 1
-        phase1_tab1, phase1_tab2 = st.tabs(["Crop Management", "Weather Data"])
+        phase1_tab1, phase1_tab2 = st.tabs(["Gerenciamento de Culturas", "Dados Meteorológicos"])
         
         # Tab 1: Crop Management - using functions from Phase 1
         with phase1_tab1:
@@ -292,7 +409,8 @@ with tab1:
 
 
 # Phase 2: Database Structure
-with tab2:
+# Fase 2: Database Structure
+elif selected_page == "Fase 2: Banco de Dados":
     st.header("Fase 2: Estrutura de Banco de Dados")
     st.markdown(
         """
@@ -319,7 +437,8 @@ with tab2:
         st.warning("Arquivo de esquema SQL não encontrado.")
 
 # Phase 3: IoT Irrigation
-with tab3:
+# Fase 3: IoT Irrigation
+elif selected_page == "Fase 3: Irrigação IoT":
     st.header("Fase 3: Lógica de Irrigação IoT")
     st.markdown(
         """
@@ -387,7 +506,8 @@ with tab3:
         st.error(f"Erro ao inicializar os componentes da Fase 3: {e}")
 
 # Phase 6: Computer Vision
-with tab6:
+# Fase 6: Computer Vision
+elif selected_page == "Fase 6: Visão Computacional":
     st.header("Fase 6: Visão Computacional para Agricultura")
     st.markdown(
         """
