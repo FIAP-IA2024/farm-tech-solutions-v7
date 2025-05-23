@@ -51,6 +51,10 @@ Este projeto representa a Fase 7 - A Consolidação de um Sistema, onde integram
 /farm-tech-solutions-v7
 ├── src/
 │   ├── dashboard.py          # Dashboard principal integrado
+│   ├── lambda_alert.py       # Integração com a Lambda AWS para alertas
+│   ├── utils/
+│   │   ├── __init__.py        # Define o diretório como pacote Python
+│   │   └── helpers.py         # Funções auxiliares para o sistema de alertas
 │   └── phases/
 │       ├── v1/                 # Fase 1: Plantio e Dados Meteorológicos
 │       ├── v2/                 # Fase 2: Banco de Dados Estruturado
@@ -122,6 +126,8 @@ Este projeto representa a Fase 7 - A Consolidação de um Sistema, onde integram
     - Scikit-learn (para Machine Learning na Fase 4)
     - Ultralytics/YOLO (para visão computacional na Fase 6)
     - Flask (para APIs web na Fase 3)
+    - Requests (para integração com APIs externas e sistema de alertas)
+    - JSON (para formatação de dados de alertas)
   - **R**:
     - dplyr (para manipulação de dados)
     - ggplot2 (para visualizações gráficas)
@@ -132,6 +138,9 @@ Este projeto representa a Fase 7 - A Consolidação de um Sistema, onde integram
     - EC2 (para hospedagem do dashboard)
     - S3 (para armazenamento de dados)
     - CloudWatch (para monitoramento)
+    - Lambda (para processamento serverless do sistema de alertas)
+    - API Gateway (para exposição de endpoints REST)
+    - SNS (Simple Notification Service para envio de alertas por email)
   - **Hardware**:
     - ESP32 (microcontrolador para IoT)
     - Sensores (umidade, pH, temperatura, etc.)
@@ -149,7 +158,61 @@ Este projeto representa a Fase 7 - A Consolidação de um Sistema, onde integram
 - Implementar um serviço de mensageria na AWS que integre a dashboard geral da fazenda
 - Enviar alertas via e-mail ou SMS para funcionários com ações corretivas baseadas nos dados das Fases 1, 3 ou 6
 
-WIP
+### 🔧 Implementação do Sistema de Alertas
+
+#### Arquitetura do Sistema
+
+O sistema de alertas foi implementado usando uma arquitetura serverless na AWS, com os seguintes componentes:
+
+1. **Frontend**: Interface de usuário integrada ao dashboard principal para envio de alertas
+2. **API Gateway**: Endpoint REST que recebe as solicitações de alerta
+3. **Lambda Function**: Processa os alertas recebidos e aciona o serviço de notificação
+4. **Amazon SNS**: Serviço de notificação que envia emails para a equipe de campo
+
+#### Tipos de Alertas
+
+O sistema suporta diversos tipos de alertas, incluindo:
+
+- **Alertas de Irrigação**: Detectados quando sensores de umidade reportam níveis abaixo do ideal
+- **Alertas de Pragas**: Identificados pelo sistema de visão computacional ao processar imagens das plantações
+- **Alertas Meteorológicos**: Baseados nas previsões do tempo obtidas pela API na Fase 1
+- **Alertas Nutricionais**: Quando análises de solo indicam deficiências de nutrientes específicos
+
+#### Como Usar o Sistema de Alertas
+
+1. Acesse a seção "Alertas" no menu lateral do dashboard
+2. Preencha o formulário com as informações do alerta:
+   - Selecione a cultura afetada
+   - Indique o tipo de problema
+   - Adicione uma descrição detalhada (opcional)
+   - Defina o nível de prioridade
+3. Clique em "Enviar Alerta"
+4. O sistema mostrará uma confirmação de envio bem-sucedido
+5. Os destinatários receberão um email com as informações do alerta e ações recomendadas
+
+#### Endpoint da API
+
+O sistema de alertas utiliza o seguinte endpoint:
+
+```
+https://wuu3yuphjl.execute-api.us-east-1.amazonaws.com/pedidos
+```
+
+A API espera um payload JSON no seguinte formato:
+
+```json
+{
+  "crop": "Nome da cultura",
+  "issue": "Descrição do problema"
+}
+```
+
+#### Beneficios do Sistema de Alertas
+
+- **Tempo de Resposta**: Redução significativa no tempo entre a detecção de problemas e a execução de ações corretivas
+- **Precisão**: Informações detalhadas sobre o problema e ações recomendadas
+- **Monitoramento Contínuo**: Alertas podem ser gerados automaticamente a partir de dados dos sensores IoT e análises de imagens
+- **Escala**: A arquitetura serverless permite escalar automaticamente conforme o número de alertas aumenta
 
 ## 🎥 Demonstração no YouTube
 

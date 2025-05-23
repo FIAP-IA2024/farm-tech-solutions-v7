@@ -8,6 +8,8 @@ import subprocess
 import tempfile
 import math
 import time
+import requests
+import json
 from datetime import datetime
 from pathlib import Path
 
@@ -115,8 +117,13 @@ if st.sidebar.button("💧 Fase 3: Irrigação IoT", key="fase3_btn", use_contai
     st.rerun()
     
 # Botão Fase 6
-if st.sidebar.button("📸 Fase 6: Visão Computacional", key="fase6_btn", use_container_width=True, type="primary" if st.session_state.selected_page == "Fase 6: Visão Computacional" else "secondary"):
+if st.sidebar.button("📷 Fase 6: Visão Computacional", key="fase6_btn", use_container_width=True, type="primary" if st.session_state.selected_page == "Fase 6: Visão Computacional" else "secondary"):
     change_page("Fase 6: Visão Computacional")
+    st.rerun()
+
+# Botão Alertas (Sistema de alertas AWS)
+if st.sidebar.button("🔔 Alertas", key="alertas_btn", use_container_width=True, type="primary" if st.session_state.selected_page == "Alertas" else "secondary"):
+    change_page("Alertas")
     st.rerun()
 
 # Adicionar separação após os botões
@@ -832,14 +839,198 @@ elif selected_page == "Fase 6: Visão Computacional":
         else:
             st.info("Nenhum resultado disponível. Execute o treinamento de detecção de objetos primeiro.")
 
+# Página de Alertas
+elif selected_page == "Alertas":
+    st.header("🔔 Sistema de Alertas")
+    
+    st.markdown(
+        """
+        Este módulo permite enviar alertas para a equipe de campo quando problemas são detectados nas culturas.
+        Os alertas são processados por uma função AWS Lambda e enviados por email através do Amazon SNS.
+        """
+    )
+    
+    # Criar colunas para o layout
+    col1, col2 = st.columns([1, 1])
+    
+    with col1:
+        st.subheader("Enviar um Novo Alerta")
+        
+        # Criar formulário para envio de alertas
+        with st.form(key='alert_form'):
+            # Lista de culturas comuns para seleção
+            culturas_comuns = [
+                "Selecione uma cultura",
+                "Milho", 
+                "Soja", 
+                "Café", 
+                "Algodão", 
+                "Cana-de-açúcar", 
+                "Trigo", 
+                "Feijão",
+                "Outra (especificar)"
+            ]
+            
+            # Problemas pré-definidos
+            problemas_comuns = [
+                "Selecione um problema",
+                "Umidade do solo baixa", 
+                "Possível infestação de pragas", 
+                "Deficiência nutricional", 
+                "Sinais de doença", 
+                "Irrigação insuficiente", 
+                "Irrigação excessiva",
+                "Outro (especificar)"
+            ]
+            
+            # Seleção da cultura
+            cultura_selecionada = st.selectbox(
+                "Cultura:",
+                culturas_comuns
+            )
+            
+            # Se 'Outra' for selecionada, permitir entrada de texto
+            if cultura_selecionada == "Outra (especificar)":
+                cultura_personalizada = st.text_input("Especifique a cultura:")
+            
+            # Seleção do problema
+            problema_selecionado = st.selectbox(
+                "Problema:",
+                problemas_comuns
+            )
+            
+            # Se 'Outro' for selecionado, permitir entrada de texto
+            if problema_selecionado == "Outro (especificar)":
+                problema_personalizado = st.text_input("Especifique o problema:")
+            
+            # Campo para descrição detalhada
+            descricao = st.text_area("Descrição detalhada (opcional):", height=100)
+            
+            # Seleção de prioridade
+            prioridade = st.select_slider(
+                "Prioridade:",
+                options=["Baixa", "Média", "Alta"],
+                value="Média"
+            )
+            
+            # Botão de envio
+            submit_button = st.form_submit_button(label="Enviar Alerta")
+            
+            if submit_button:
+                # Determinar a cultura final (selecionada ou personalizada)
+                if cultura_selecionada == "Outra (especificar)":
+                    cultura_final = cultura_personalizada
+                elif cultura_selecionada == "Selecione uma cultura":
+                    st.error("Por favor, selecione uma cultura.")
+                    cultura_final = None
+                else:
+                    cultura_final = cultura_selecionada
+                
+                # Determinar o problema final (selecionado ou personalizado)
+                if problema_selecionado == "Outro (especificar)":
+                    problema_final = problema_personalizado
+                elif problema_selecionado == "Selecione um problema":
+                    st.error("Por favor, selecione um problema.")
+                    problema_final = None
+                else:
+                    problema_final = problema_selecionado
+                
+                # Formatar a mensagem de alerta completa
+                if cultura_final and problema_final:
+                    # Adicionar a descrição se fornecida
+                    mensagem_completa = f"{problema_final}"
+                    if descricao:
+                        mensagem_completa += f" - {descricao}"
+                    
+                    # Adicionar a prioridade
+                    mensagem_completa += f" [Prioridade: {prioridade}]"
+                    
+                    try:
+                        # Enviar o alerta
+                        payload = {
+                            "crop": cultura_final,
+                            "issue": mensagem_completa
+                        }
+                        
+                        # Fazer a requisição POST para a API Lambda
+                        response = requests.post(
+                            "https://wuu3yuphjl.execute-api.us-east-1.amazonaws.com/pedidos",
+                            data=json.dumps(payload),
+                            headers={"Content-Type": "application/json"}
+                        )
+                        
+                        # Verificar a resposta
+                        if response.status_code == 200:
+                            st.success("✅ Alerta enviado com sucesso!")
+                            st.balloons()
+                        else:
+                            st.error(f"❌ Erro ao enviar o alerta: {response.status_code}")
+                            st.write("Detalhes:", response.text)
+                    
+                    except Exception as e:
+                        st.error(f"❌ Erro ao processar o alerta: {str(e)}")
+    
+    with col2:
+        st.subheader("Informações do Sistema")
+        
+        # Card explicativo sobre o sistema de alertas
+        st.info(
+            """
+            ### Como Funciona
+            
+            1. **Detecção de Problemas**: Problemas podem ser identificados manualmente ou automaticamente pelos sensores IoT e sistema de visão computacional.
+            
+            2. **Processamento de Alertas**: Os alertas são processados por uma função AWS Lambda.
+            
+            3. **Notificação**: Alertas são enviados via email para a equipe de campo através do Amazon SNS.
+            
+            4. **Ação**: A equipe de campo toma as medidas corretivas necessárias com base nas instruções recebidas.
+            """
+        )
+        
+        st.markdown("### Exemplos de Alertas")
+        
+        # Exemplos de alertas em cards coloridos
+        st.error(
+            """
+            **Alerta: Umidade do solo baixa**
+            
+            * **Cultura**: Milho
+            * **Local**: Setor B-12
+            * **Ação Requerida**: Ativar sistema de irrigação por 45 minutos
+            * **Prioridade**: Alta
+            """
+        )
+        
+        st.warning(
+            """
+            **Alerta: Possível infestação de pragas**
+            
+            * **Cultura**: Soja
+            * **Local**: Zona 3
+            * **Ação Requerida**: Inspeção manual e aplicar pesticidas orgânicos se confirmado
+            * **Prioridade**: Média
+            """
+        )
+        
+        st.info(
+            """
+            **Alerta: Previsão de geada**
+            
+            * **Culturas Afetadas**: Todas
+            * **Período**: Madrugada de amanhã
+            * **Ação Requerida**: Ativar sistema de proteção térmica nas culturas sensíveis
+            * **Prioridade**: Alta
+            """
+        )
+
 # Footer
 st.markdown("---")
 st.markdown(
     """
     <div style='text-align: center'>
-        <p>FarmTech System - Dashboard Integrado</p>
-        <p>© 2025 FIAP</p>
+    <p>FarmTech System - Dashboard Integrado 2025</p>
+    <p>Desenvolvido por: Gabriel Ribeiro, Jonas Felipe, Marcos Trazzini, Edimilson Ribeiro</p>
     </div>
-    """,
-    unsafe_allow_html=True
+    """, unsafe_allow_html=True
 )
