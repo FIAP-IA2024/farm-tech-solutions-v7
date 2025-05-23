@@ -7,6 +7,8 @@ import importlib.util
 import subprocess
 import tempfile
 import math
+import time
+from datetime import datetime
 from pathlib import Path
 
 # Add project root to path for proper imports
@@ -400,13 +402,45 @@ with tab6:
         epochs = st.slider("Number of epochs", min_value=10, max_value=100, value=30, step=10)
         batch_size = st.slider("Batch size", min_value=4, max_value=32, value=16, step=4)
         
+        # Adicionar log viewer para mostrar logs em tempo real
+        if 'running_phase6' not in st.session_state:
+            st.session_state.running_phase6 = False
+            
+        if 'phase6_log' not in st.session_state:
+            st.session_state.phase6_log = []
+        
         if st.button("Run Object Detection Training", key="run_phase6"):
             try:
-                st.info("Starting YOLO object detection training... This may take a while.")
+                # Marcar como running para mostrar progresso
+                st.session_state.running_phase6 = True
+                st.session_state.phase6_log = []
                 
-                # Execute the Python script from Phase 6
-                with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.txt') as temp_file:
-                    # Use absolute path for the Phase 6 script
+                # Inicializar o arquivo de log
+                log_file_path = os.path.join(project_root, "yolo_training.log")
+                if os.path.exists(log_file_path):
+                    os.remove(log_file_path)
+                    
+                # Adicionar uma mensagem inicial ao log
+                with open(log_file_path, 'w') as f:
+                    f.write(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Iniciando treinamento YOLO com {epochs} épocas e batch size {batch_size}\n")
+                
+                # Execute the Python script from Phase 6 in background
+                cv_script = os.path.join(project_root, "src", "phases", "v6", "notebooks", "GabrielRibeiro_rm560173_pbl_fase6.py")
+                
+                # Rerun para atualizar a UI
+                st.rerun()
+                
+            except Exception as e:
+                st.error(f"Error starting object detection: {e}")
+                st.session_state.running_phase6 = False
+        
+        # Mostrar progresso e logs quando estiver rodando
+        if st.session_state.running_phase6:
+            # Spinner e mensagem de progresso
+            with st.spinner("Treinamento de detecção de objetos em andamento... Isso pode levar vários minutos."):
+                # Verificar se o processo já está rodando, se não, iniciar
+                if not hasattr(st.session_state, 'phase6_process') or st.session_state.phase6_process is None:
+                    # Iniciar o processo
                     cv_script = os.path.join(project_root, "src", "phases", "v6", "notebooks", "GabrielRibeiro_rm560173_pbl_fase6.py")
                     process = subprocess.Popen(
                         [
@@ -416,79 +450,254 @@ with tab6:
                             "--batch-size", str(batch_size)
                         ],
                         cwd=str(project_root),
-                        stdout=temp_file,
+                        stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE,
                         text=True
                     )
+                    st.session_state.phase6_process = process
                     
-                    # Show a progress message
-                    st.info("Object detection training in progress. Please wait...")
-                    stderr = process.communicate()[1]
-                    
-                    # Read the results
-                    temp_file.close()
-                    with open(temp_file.name, 'r') as f:
-                        output = f.read()
-                    
-                    if process.returncode != 0:
-                        st.error(f"Error running object detection: {stderr}")
+                # Verificar status do processo
+                process = st.session_state.phase6_process
+                if process.poll() is not None:
+                    # Processo terminou
+                    stdout, stderr = process.communicate()
+                    if process.returncode == 0:
+                        st.success("Treinamento de detecção de objetos concluído com sucesso!")
+                        # Adicionar o output final ao log
+                        with open(os.path.join(project_root, "yolo_training.log"), 'a') as f:
+                            f.write(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Treinamento concluído com sucesso!\n")
                     else:
-                        st.success("Object detection training completed successfully!")
-                        st.code(output)
+                        st.error(f"Erro ao executar a detecção de objetos: {stderr}")
+                        # Adicionar o erro ao log
+                        with open(os.path.join(project_root, "yolo_training.log"), 'a') as f:
+                            f.write(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Erro no treinamento: {stderr}\n")
                     
-                    # Clean up
-                    os.unlink(temp_file.name)
-            except Exception as e:
-                st.error(f"Error running object detection: {e}")
+                    # Limpar o processo
+                    st.session_state.phase6_process = None
+                    st.session_state.running_phase6 = False
+                    
+                    # Rerun para atualizar a UI
+                    time.sleep(1)  # Pequena pausa para permitir que o usuário veja a mensagem
+                    st.rerun()
+            
+            # Mostrar logs em tempo real
+            log_file_path = os.path.join(project_root, "yolo_training.log")
+            if os.path.exists(log_file_path):
+                with open(log_file_path, 'r') as f:
+                    log_content = f.read()
+                    
+                if log_content:
+                    st.subheader("Log do Treinamento (Tempo Real)")
+                    st.text_area("\n", log_content, height=300)
+                    
+            # Botão para cancelar o treinamento
+            if st.button("Cancelar Treinamento", key="cancel_phase6"):
+                if hasattr(st.session_state, 'phase6_process') and st.session_state.phase6_process is not None:
+                    try:
+                        st.session_state.phase6_process.terminate()
+                        st.session_state.phase6_process = None
+                        st.session_state.running_phase6 = False
+                        st.success("Treinamento cancelado pelo usuário.")
+                        
+                        # Adicionar ao log
+                        with open(os.path.join(project_root, "yolo_training.log"), 'a') as f:
+                            f.write(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Treinamento cancelado pelo usuário.\n")
+                            
+                        time.sleep(1)  # Pequena pausa para permitir que o usuário veja a mensagem
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Erro ao cancelar o treinamento: {e}")
     
     with col2:
-        st.subheader("View Results")
+        st.subheader("Visualizar Resultados")
         st.markdown(
             """
-            After running the object detection, the results will be saved in the results directory.
-            You can find:
-            - Training metrics
-            - Validation results
-            - Test predictions
-            - Performance analysis
+            Após a execução da detecção de objetos, os resultados são salvos nos diretórios de resultados.
+            Você pode encontrar:
+            - Métricas de treinamento
+            - Resultados de validação
+            - Predições de teste
+            - Análise de desempenho
             """
         )
         
-        # Check if results directory exists and list available result folders
-        results_dir = os.path.join(project_root, "src", "phases", "v6", "results")
-        if os.path.exists(results_dir) and os.path.isdir(results_dir):
-            # Convert string path to Path object for directory operations
-            results_path = Path(results_dir)
-            result_folders = [f for f in results_path.iterdir() if f.is_dir()]
-            if result_folders:
-                selected_result = st.selectbox(
-                    "Select a result to view:",
-                    options=[f.name for f in result_folders],
-                    index=0
-                )
-                
-                # Display some images from the selected result folder
-                selected_path = results_path / selected_result
-                image_files = list(selected_path.glob("*.png")) + list(selected_path.glob("*.jpg"))
-                
+        # Verificar resultados em ambos os diretórios: src/phases/v6/results e /results
+        phase6_results_dir = os.path.join(project_root, "src", "phases", "v6", "results")
+        root_results_dir = os.path.join(project_root, "results")
+        
+        # Criar o diretório de resultados na raiz se não existir
+        if not os.path.exists(root_results_dir):
+            os.makedirs(root_results_dir)
+        
+        # Combinar resultados de ambos os diretórios
+        all_result_paths = []
+        all_result_names = []
+        
+        # Adicionar resultados do diretório phase6_results_dir
+        if os.path.exists(phase6_results_dir) and os.path.isdir(phase6_results_dir):
+            phase6_results_path = Path(phase6_results_dir)
+            for folder in phase6_results_path.iterdir():
+                if folder.is_dir():
+                    all_result_paths.append(folder)
+                    all_result_names.append(f"v6/{folder.name}")
+        
+        # Adicionar resultados do diretório root_results_dir
+        if os.path.exists(root_results_dir) and os.path.isdir(root_results_dir):
+            root_results_path = Path(root_results_dir)
+            for folder in root_results_path.iterdir():
+                if folder.is_dir():
+                    all_result_paths.append(folder)
+                    all_result_names.append(f"root/{folder.name}")
+        
+        if all_result_paths:
+            selected_result_idx = st.selectbox(
+                "Selecione um resultado para visualizar:",
+                options=all_result_names,
+                index=0
+            )
+            
+            # Extrair o índice do resultado selecionado
+            selected_idx = all_result_names.index(selected_result_idx)
+            selected_path = all_result_paths[selected_idx]
+            
+            # Exibir informações sobre o resultado selecionado
+            st.info(f"Diretório do resultado: {selected_path}")
+            
+            # Encontrar imagens e arquivos de texto no diretório selecionado
+            image_files = list(selected_path.glob("*.png")) + list(selected_path.glob("*.jpg"))
+            text_files = list(selected_path.glob("*.txt")) + list(selected_path.glob("*.log")) + list(selected_path.glob("*.csv"))
+            other_files = list(selected_path.glob("*.json")) + list(selected_path.glob("*.yaml"))
+            
+            # Criar tabs para diferentes tipos de arquivos
+            if image_files or text_files or other_files:
+                tabs = []
                 if image_files:
-                    selected_image = st.selectbox(
-                        "Select an image to view:",
-                        options=[img.name for img in image_files],
-                        index=0
-                    )
-                    
-                    st.image(
-                        str(selected_path / selected_image),
-                        caption=selected_image,
-                        use_column_width=True
-                    )
-                else:
-                    st.info("No image results found in this folder.")
+                    tabs.append("Imagens")
+                if text_files:
+                    tabs.append("Arquivos de Texto")
+                if other_files:
+                    tabs.append("Outros Arquivos")
+                
+                # Criar as tabs dinamicamente com base nos tipos de arquivos encontrados
+                result_tabs = st.tabs(tabs)
+                
+                tab_idx = 0
+                
+                # Tab de imagens
+                if image_files:
+                    with result_tabs[tab_idx]:
+                        st.subheader("Imagens")
+                        
+                        # Criar galeria de imagens
+                        selected_image = st.selectbox(
+                            "Selecione uma imagem para visualizar:",
+                            options=[img.name for img in image_files],
+                            index=0
+                        )
+                        
+                        # Encontrar a imagem selecionada
+                        selected_img_path = next((img for img in image_files if img.name == selected_image), None)
+                        
+                        if selected_img_path:
+                            st.image(
+                                str(selected_img_path),
+                                caption=selected_image,
+                                use_column_width=True
+                            )
+                            
+                            # Opção para baixar a imagem
+                            with open(selected_img_path, "rb") as file:
+                                st.download_button(
+                                    label="Baixar Imagem",
+                                    data=file,
+                                    file_name=selected_image,
+                                    mime="image/png" if selected_image.endswith(".png") else "image/jpeg"
+                                )
+                    tab_idx += 1
+                
+                # Tab de arquivos de texto
+                if text_files:
+                    with result_tabs[tab_idx]:
+                        st.subheader("Arquivos de Texto")
+                        
+                        selected_text = st.selectbox(
+                            "Selecione um arquivo de texto para visualizar:",
+                            options=[txt.name for txt in text_files],
+                            index=0
+                        )
+                        
+                        # Encontrar o arquivo de texto selecionado
+                        selected_txt_path = next((txt for txt in text_files if txt.name == selected_text), None)
+                        
+                        if selected_txt_path:
+                            try:
+                                with open(selected_txt_path, "r") as file:
+                                    content = file.read()
+                                
+                                # Mostrar conteúdo com base na extensão do arquivo
+                                if selected_text.endswith(".csv"):
+                                    try:
+                                        df = pd.read_csv(selected_txt_path)
+                                        st.dataframe(df)
+                                    except:
+                                        st.text_area("Conteúdo do Arquivo", content, height=400)
+                                else:
+                                    st.text_area("Conteúdo do Arquivo", content, height=400)
+                                
+                                # Opção para baixar o arquivo
+                                st.download_button(
+                                    label="Baixar Arquivo",
+                                    data=content,
+                                    file_name=selected_text,
+                                    mime="text/plain"
+                                )
+                            except Exception as e:
+                                st.error(f"Erro ao ler o arquivo: {e}")
+                    tab_idx += 1
+                
+                # Tab de outros arquivos
+                if other_files:
+                    with result_tabs[tab_idx]:
+                        st.subheader("Outros Arquivos")
+                        
+                        selected_file = st.selectbox(
+                            "Selecione um arquivo para visualizar:",
+                            options=[f.name for f in other_files],
+                            index=0
+                        )
+                        
+                        # Encontrar o arquivo selecionado
+                        selected_file_path = next((f for f in other_files if f.name == selected_file), None)
+                        
+                        if selected_file_path:
+                            try:
+                                with open(selected_file_path, "r") as file:
+                                    content = file.read()
+                                
+                                # Exibir conteúdo JSON ou YAML formatado
+                                if selected_file.endswith(".json"):
+                                    import json
+                                    try:
+                                        json_data = json.loads(content)
+                                        st.json(json_data)
+                                    except:
+                                        st.text_area("Conteúdo do Arquivo", content, height=400)
+                                else:
+                                    st.text_area("Conteúdo do Arquivo", content, height=400)
+                                
+                                # Opção para baixar o arquivo
+                                st.download_button(
+                                    label="Baixar Arquivo",
+                                    data=content,
+                                    file_name=selected_file,
+                                    mime="application/json" if selected_file.endswith(".json") else "text/plain"
+                                )
+                            except Exception as e:
+                                st.error(f"Erro ao ler o arquivo: {e}")
             else:
-                st.info("No results available. Run the object detection first.")
+                st.info("Não foram encontrados arquivos de resultados neste diretório.")
         else:
-            st.info("Results directory not found. Run the object detection first.")
+            st.info("Nenhum resultado disponível. Execute o treinamento de detecção de objetos primeiro.")
 
 # Footer
 st.markdown("---")

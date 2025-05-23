@@ -9,4 +9,4 @@ results/*
 !results/.gitkeep
 yolo_training.log
 yolov5s.pt
-labels.cache
+yolov5
