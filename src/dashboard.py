@@ -37,7 +37,7 @@ def import_module_from_file(module_name, file_path):
 
 # Configure page
 st.set_page_config(
-    page_title="FarmTech System - Integrated Dashboard",
+    page_title="FarmTech System - Dashboard Integrado",
     page_icon="🌱",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -45,32 +45,32 @@ st.set_page_config(
 
 # Add sidebar
 st.sidebar.title("FarmTech System")
-st.sidebar.subheader("Integrated Dashboard")
+st.sidebar.subheader("Dashboard Integrado")
 st.sidebar.markdown("---")
 
 # Main content
-st.title("🌱 FarmTech System - Integrated Dashboard")
+st.title("🌱 FarmTech System - Dashboard Integrado")
 st.markdown(
     """
-    This dashboard integrates multiple phases of the FarmTech project:
-    - **Phase 1**: Planting area calculation and weather data ingestion
-    - **Phase 2**: Relational database structure and models
-    - **Phase 3**: Simulated IoT irrigation logic
-    - **Phase 6**: Image analysis using computer vision
+    Este dashboard integra múltiplas fases do projeto FarmTech:
+    - **Fase 1**: Cálculo de área de plantio e dados meteorológicos
+    - **Fase 2**: Estrutura e modelos de banco de dados relacional
+    - **Fase 3**: Lógica de irrigação IoT simulada
+    - **Fase 6**: Análise de imagens com visão computacional
     
-    Select a phase from the tabs below to interact with its functionality.
+    Selecione uma fase abaixo para interagir com suas funcionalidades.
     """
 )
 
 # Create tabs for each phase
-tab1, tab2, tab3, tab6 = st.tabs(["Phase 1: Planting & Weather", "Phase 2: Database", "Phase 3: IoT Irrigation", "Phase 6: Computer Vision"])
+tab1, tab2, tab3, tab6 = st.tabs(["Fase 1: Plantio & Clima", "Fase 2: Banco de Dados", "Fase 3: Irrigação IoT", "Fase 6: Visão Computacional"])
 
 # Phase 1: Planting area calculation and weather data
 with tab1:
-    st.header("Phase 1: Planting Area & Weather Data")
+    st.header("Fase 1: Área de Plantio & Dados Climáticos")
     st.markdown(
         """
-        This phase calculates planting areas and manages crop data. It also provides weather data through the OpenWeather API.
+        Esta fase calcula áreas de plantio e gerencia dados de culturas. Também fornece dados meteorológicos através da API OpenWeather.
         """
     )
     
@@ -293,37 +293,37 @@ with tab1:
 
 # Phase 2: Database Structure
 with tab2:
-    st.header("Phase 2: Database Structure")
+    st.header("Fase 2: Estrutura de Banco de Dados")
     st.markdown(
         """
-        This phase provides the relational database structure for managing agricultural inputs.
+        Esta fase fornece a estrutura de banco de dados relacional para gerenciar insumos agrícolas.
         """
     )
     
     # Display the database diagram
-    st.subheader("Database Entity-Relationship Diagram")
+    st.subheader("Diagrama Entidade-Relacionamento")
     diagram_path = PHASE2_PATH / "diagram.png"
     if diagram_path.exists():
-        st.image(str(diagram_path), caption="Database Entity-Relationship Diagram")
+        st.image(str(diagram_path), caption="Diagrama Entidade-Relacionamento do Banco de Dados")
     else:
-        st.warning("Database diagram not found.")
+        st.warning("Diagrama do banco de dados não encontrado.")
     
     # Show SQL Schema
-    st.subheader("SQL Schema")
+    st.subheader("Esquema SQL")
     sql_path = PHASE2_PATH / "data-model.sql"
     if sql_path.exists():
         with open(sql_path, 'r') as f:
             sql_content = f.read()
         st.code(sql_content, language="sql")
     else:
-        st.warning("SQL schema file not found.")
+        st.warning("Arquivo de esquema SQL não encontrado.")
 
 # Phase 3: IoT Irrigation
 with tab3:
-    st.header("Phase 3: IoT Irrigation Logic")
+    st.header("Fase 3: Lógica de Irrigação IoT")
     st.markdown(
         """
-        This phase simulates IoT devices for monitoring and controlling irrigation systems.
+        Esta fase simula dispositivos IoT para monitoramento e controle de sistemas de irrigação.
         """
     )
     
@@ -338,34 +338,34 @@ with tab3:
         
         if weather_module and database_module:
             # Weather data
-            st.subheader("Weather Data")
-            city = st.text_input("Enter city name:", "Sao Paulo", key="phase3_city_input")
+            st.subheader("Dados Meteorológicos")
+            city = st.text_input("Digite o nome da cidade:", "Sao Paulo", key="phase3_city_input")
             
-            if st.button("Get Weather Data", key="run_phase3_weather"):
+            if st.button("Obter Dados Meteorológicos", key="run_phase3_weather"):
                 try:
                     weather_data = weather_module.get_weather_data(city)
                     if weather_data:
                         col1, col2 = st.columns(2)
                         with col1:
-                            st.metric("Temperature (°C)", weather_data["temperature"])
+                            st.metric("Temperatura (°C)", weather_data["temperature"])
                         with col2:
-                            st.metric("Humidity (%)", weather_data["humidity"])
-                        st.write(f"Description: {weather_data['description'].capitalize()}")
+                            st.metric("Umidade (%)", weather_data["humidity"])
+                        st.write(f"Descrição: {weather_data['description'].capitalize()}")
                     else:
-                        st.warning("Could not retrieve weather data. Check the city name.")
+                        st.warning("Não foi possível obter dados meteorológicos. Verifique o nome da cidade.")
                 except Exception as e:
-                    st.error(f"Error getting weather data: {e}")
+                    st.error(f"Erro ao obter dados meteorológicos: {e}")
             
             # Sensor data
-            st.subheader("Sensor Data")
-            if st.button("Load Sensor Data", key="run_phase3_sensors"):
+            st.subheader("Dados dos Sensores")
+            if st.button("Carregar Dados dos Sensores", key="run_phase3_sensors"):
                 try:
                     sensor_data = database_module.fetch_sensor_data()
                     if not sensor_data.empty:
                         st.dataframe(sensor_data)
                         
                         # Display some visualizations
-                        st.subheader("Sensor Data Visualizations")
+                        st.subheader("Visualizações dos Dados dos Sensores")
                         
                         # Group by month
                         monthly_data = sensor_data.groupby("month").mean().reset_index()
@@ -373,35 +373,35 @@ with tab3:
                         # Humidity chart
                         fig, ax = plt.subplots(figsize=(10, 4))
                         ax.plot(monthly_data["month"].astype(str), monthly_data["humidity"], marker="o")
-                        ax.set_xlabel("Month")
-                        ax.set_ylabel("Average Humidity (%)")
-                        ax.set_title("Monthly Average Humidity")
+                        ax.set_xlabel("Mês")
+                        ax.set_ylabel("Umidade Média (%)")
+                        ax.set_title("Umidade Média Mensal")
                         st.pyplot(fig)
                     else:
-                        st.warning("No sensor data available.")
+                        st.warning("Nenhum dado de sensor disponível.")
                 except Exception as e:
-                    st.error(f"Error loading sensor data: {e}")
+                    st.error(f"Erro ao carregar dados dos sensores: {e}")
         else:
-            st.warning("Could not load the necessary modules from Phase 3.")
+            st.warning("Não foi possível carregar os módulos necessários da Fase 3.")
     except Exception as e:
-        st.error(f"Error initializing Phase 3 components: {e}")
+        st.error(f"Erro ao inicializar os componentes da Fase 3: {e}")
 
 # Phase 6: Computer Vision
 with tab6:
-    st.header("Phase 6: Computer Vision for Agriculture")
+    st.header("Fase 6: Visão Computacional para Agricultura")
     st.markdown(
         """
-        This phase implements computer vision using YOLO for object detection in agricultural applications.
+        Esta fase implementa visão computacional usando YOLO para detecção de objetos em aplicações agrícolas.
         """
     )
     
     # Usar tabs em vez de colunas para organizar melhor o conteúdo
-    train_tab, results_tab = st.tabs(["Run Object Detection", "Visualizar Resultados"])
+    train_tab, results_tab = st.tabs(["Executar Detecção de Objetos", "Visualizar Resultados"])
     
     with train_tab:
-        st.subheader("Run Object Detection")
-        epochs = st.slider("Number of epochs", min_value=10, max_value=100, value=30, step=10)
-        batch_size = st.slider("Batch size", min_value=4, max_value=32, value=16, step=4)
+        st.subheader("Executar Detecção de Objetos")
+        epochs = st.slider("Número de épocas", min_value=10, max_value=100, value=30, step=10)
+        batch_size = st.slider("Tamanho do lote (batch size)", min_value=4, max_value=32, value=16, step=4)
         
         # Adicionar log viewer para mostrar logs em tempo real
         if 'running_phase6' not in st.session_state:
@@ -410,7 +410,7 @@ with tab6:
         if 'phase6_log' not in st.session_state:
             st.session_state.phase6_log = []
         
-        if st.button("Run Object Detection Training", key="run_phase6"):
+        if st.button("Iniciar Treinamento de Detecção de Objetos", key="run_phase6"):
             try:
                 # Marcar como running para mostrar progresso
                 st.session_state.running_phase6 = True
@@ -432,7 +432,7 @@ with tab6:
                 st.rerun()
                 
             except Exception as e:
-                st.error(f"Error starting object detection: {e}")
+                st.error(f"Erro ao iniciar detecção de objetos: {e}")
                 st.session_state.running_phase6 = False
         
         # Mostrar progresso e logs quando estiver rodando
@@ -717,7 +717,7 @@ st.markdown("---")
 st.markdown(
     """
     <div style='text-align: center'>
-        <p>FarmTech System - Integrated Dashboard</p>
+        <p>FarmTech System - Dashboard Integrado</p>
         <p>© 2025 FIAP</p>
     </div>
     """,
