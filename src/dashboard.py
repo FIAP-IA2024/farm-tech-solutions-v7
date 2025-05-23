@@ -549,7 +549,8 @@ with tab6:
         if os.path.exists(phase6_results_dir) and os.path.isdir(phase6_results_dir):
             phase6_results_path = Path(phase6_results_dir)
             for folder in phase6_results_path.iterdir():
-                if folder.is_dir():
+                # Excluir o diretório 'comparison' da lista de resultados
+                if folder.is_dir() and folder.name != 'comparison':
                     all_result_paths.append(folder)
                     all_result_names.append(f"v6/{folder.name}")
         
