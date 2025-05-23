@@ -2,9 +2,12 @@ import sqlite3
 import pandas
 import os
 
-DB_PATH = "./database/data.db"
-CSV_PATH = "./database/sensor_data.csv"
-INIT_SQL_PATH = "./database/init.sql"
+# Use caminhos absolutos baseados na localização deste arquivo
+base_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(base_dir)
+DB_PATH = os.path.join(parent_dir, "database", "data.db")
+CSV_PATH = os.path.join(parent_dir, "database", "sensor_data.csv")
+INIT_SQL_PATH = os.path.join(parent_dir, "database", "init.sql")
 DB_INITIALIZED = False
 
 
