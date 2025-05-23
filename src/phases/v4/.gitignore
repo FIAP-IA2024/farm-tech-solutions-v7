@@ -1,0 +1,15 @@
+.DS_Store
+
+database/data.db
+database/*.csv
+
+__pycache__
+app/venv
+app/.env*
+!app/.env.example
+!app/.env.example
+
+analysis/outputs/**
+!analysis/outputs/.gitkeep
+
+rf_model.pkl
