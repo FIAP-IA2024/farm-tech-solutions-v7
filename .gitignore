@@ -10,3 +10,4 @@ results/*
 yolo_training.log
 yolov5s.pt
 yolov5
+labels.cache
